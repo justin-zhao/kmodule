@@ -78,6 +78,21 @@ static int thread_fn(void *arg)
 	return 0;
 }
 
+static void test_asm(void)
+{
+	int test_cnt = 20;
+	int test_res = 0;
+
+	asm volatile(
+	"mov %0, %1\n"
+	"add %0, %0, #2\n"
+	:"=&r"(test_res) //input parameters
+	:"r"(test_cnt) //output parameters
+	);
+
+	printk("Hello, World, Justin! test_res=%d\r\n", test_res);
+}
+
 static int monitor(void *unused)
 {
 	atomic_t threads_left;
@@ -95,9 +110,10 @@ static int monitor(void *unused)
 
 	unsigned long lock_num = 0, lock_delay = 0;
 
-	printk("Hello, World, Justin!\r\n");
+	test_asm();
+
 	module_put(THIS_MODULE);
-	test_done = -1;
+	test_done = 1;
 	return 0;
 repeat:
 	reinit_completion(&threads_done);

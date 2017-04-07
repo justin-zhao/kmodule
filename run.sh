@@ -1,11 +1,11 @@
 #! /bin/bash
 
 DONE="/sys/module/lockbench/parameters/test_done"
-MODULE="lockbench.ko"
+MODULE="lockbench"
 
-rmmod $MODULE > /dev/null
+rmmod $MODULE".ko" > /dev/null
 
-if ! insmod $MODULE threads_num=32; then
+if ! insmod $MODULE".ko" threads_num=32; then
 	echo "insmod fail"
 	exit -1
 fi
@@ -22,6 +22,7 @@ fi
 #	rmmod $MODULE
 #	exit -1
 #fi
+sleep 1
 
 rmmod $MODULE
 
