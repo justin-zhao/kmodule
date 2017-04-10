@@ -110,10 +110,23 @@ static int monitor(void *unused)
 	unsigned long duration1, duration2;
 
 	unsigned long lock_num = 0, lock_delay = 0;
-
-	test_asm();
+	unsigned long cycle = 0;
 
 	module_put(THIS_MODULE);
+
+	printk("Hello, World 1\r\n");
+	pmu_setup();
+	printk("Hello, World 2\r\n");
+//	test_asm();
+	cycle = pmu_get_cycle();
+	printk("cycle=%ld.\r\n", cycle);
+	cycle = pmu_get_cycle();
+	printk("cycle=%ld.\r\n", cycle);
+	cycle = pmu_get_cycle();
+	printk("cycle=%ld.\r\n", cycle);
+	cycle = pmu_get_cycle();
+	printk("cycle=%ld.\r\n", cycle);
+
 	test_done = 1;
 	return 0;
 repeat:

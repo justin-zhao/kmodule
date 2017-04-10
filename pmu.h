@@ -34,7 +34,7 @@ void pmu_setup(void)
 		"MSR	PMCNTENSET_EL0, x2\n"
 		
 		"isb sy\n"
-		"RET\n"
+//		"RET\n"
 	);
 }
 //ENDPROC(pmu_setup)
