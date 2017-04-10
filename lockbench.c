@@ -11,6 +11,7 @@
 #include <linux/percpu.h>
 #include <linux/kallsyms.h>
 #include <asm/delay.h>
+#include "pmu.h"
 
 struct thread_data {
 	int cpu;
