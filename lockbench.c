@@ -79,19 +79,48 @@ static int thread_fn(void *arg)
 	return 0;
 }
 
+
+void printv(int value)
+{
+	printk("value=%d\r\n", value);
+}
 static void test_asm(void)
 {
 	int test_cnt = 20;
-	int test_res = 0;
-
+	unsigned long test_res = 0;
+/*
 	asm volatile(
 	"mov %0, %1\n"
+	"add x0, x0, #32\n"
 	"add %0, %0, #2\n"
-	:"=&r"(test_res) //input parameters
-	:"r"(test_cnt) //output parameters
+	:"=&r"(test_res) //output parameters
+	:"r"(test_cnt) //input parameters
 	);
-
-	printk("Hello, World, Justin! test_res=%d\r\n", test_res);
+*/
+	printk("Start test...\r\n");
+	asm volatile(
+	"1: mrs x0, PMCCNTR_EL0\n"
+	"   and x0, x0, #0xFFFF \n"
+//	"   stmdb   sp!, {x0-x3}\n"
+	"	sub	sp, sp, #0x08\n"
+	"	str x0, [sp]\n"
+	"	sub	sp, sp, #0x08\n"
+	"	bl printv\n"
+//	"   add x0, x0, #0x1\n"
+/*
+	"4: sub x0, x0, #0x1\n"
+	"	bl printv\n"
+	"   nop\n"
+	"   cbnz x0, 4b\n"
+*/
+//	"	ldmdb   sp!, {x0-x3}\n"
+	"	add	sp, sp, #0x08\n"
+	"	ldr x0, [sp, #0x0]\n"
+	"	add	sp, sp, #0x08\n"
+	"	mov %0, x0\n"
+	:"=&r"(test_res) //output parameters
+	);
+	printk("End, test_res=%d\r\n", test_res);
 }
 
 static int monitor(void *unused)
@@ -112,21 +141,14 @@ static int monitor(void *unused)
 	unsigned long lock_num = 0, lock_delay = 0;
 	unsigned long cycle = 0;
 
-	module_put(THIS_MODULE);
-
-	printk("Hello, World 1\r\n");
 	pmu_setup();
-	printk("Hello, World 2\r\n");
-//	test_asm();
-	cycle = pmu_get_cycle();
-	printk("cycle=%ld.\r\n", cycle);
-	cycle = pmu_get_cycle();
-	printk("cycle=%ld.\r\n", cycle);
-	cycle = pmu_get_cycle();
-	printk("cycle=%ld.\r\n", cycle);
+	udelay(15);
+	test_asm();
+	test_asm();
 	cycle = pmu_get_cycle();
 	printk("cycle=%ld.\r\n", cycle);
 
+	module_put(THIS_MODULE);
 	test_done = 1;
 	return 0;
 repeat:
@@ -239,10 +261,7 @@ static __init int lockbench_init(void)
 
 static __exit void lockbench_exit(void)
 {
-/*	if (!test_done)
-		return -EBUSY;
-	return 0;
-*/
+	return;
 }
 
 module_init(lockbench_init);
