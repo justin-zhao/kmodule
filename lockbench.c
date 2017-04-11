@@ -100,27 +100,22 @@ static void test_asm(void)
 	printk("Start test...\r\n");
 	asm volatile(
 	"1: mrs x0, PMCCNTR_EL0\n"
-	"   and x0, x0, #0xFFFF \n"
-//	"   stmdb   sp!, {x0-x3}\n"
-	"	sub	sp, sp, #0x08\n"
-	"	str x0, [sp]\n"
-	"	sub	sp, sp, #0x08\n"
+	"   and x0, x0, #0xFF \n"
+	"   stp x0, x1, [sp, #-16]!\n"
 	"	bl printv\n"
-//	"   add x0, x0, #0x1\n"
-/*
+	"   ldp x0, x1, [sp], #16\n"
+	"   add x0, x0, #0x1\n"
+
 	"4: sub x0, x0, #0x1\n"
+	"   stp x0, x1, [sp, #-16]!\n"
 	"	bl printv\n"
+	"   ldp x0, x1, [sp], #16\n"
 	"   nop\n"
 	"   cbnz x0, 4b\n"
-*/
-//	"	ldmdb   sp!, {x0-x3}\n"
-	"	add	sp, sp, #0x08\n"
-	"	ldr x0, [sp, #0x0]\n"
-	"	add	sp, sp, #0x08\n"
 	"	mov %0, x0\n"
 	:"=&r"(test_res) //output parameters
 	);
-	printk("End, test_res=%d\r\n", test_res);
+	printk("End, test_res=%d\r\n", (int)test_res);
 }
 
 static int monitor(void *unused)
@@ -144,9 +139,9 @@ static int monitor(void *unused)
 	pmu_setup();
 	udelay(15);
 	test_asm();
-	test_asm();
+	//test_asm();
 	cycle = pmu_get_cycle();
-	printk("cycle=%ld.\r\n", cycle);
+	printk("cycle=%d.\r\n", (int)cycle);
 
 	module_put(THIS_MODULE);
 	test_done = 1;

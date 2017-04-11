@@ -26,5 +26,5 @@ sleep 1
 
 rmmod $MODULE
 
-dmesg | tail -n 16
+dmesg | tail -n 32
 
